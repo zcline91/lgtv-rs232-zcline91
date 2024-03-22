@@ -1,5 +1,5 @@
 import serial
-
+import string
 
 class LgTV():
     _commands = {
@@ -246,7 +246,11 @@ class LgTV():
 
         self._ser.write(request)
 
-        response = str(self._ser.read_until(b'x'), 'ascii').strip('x')
+        response_raw = self._ser.read_until(b'x')
+        # There can be some garbage on console after power on command
+        # Lets filter it out
+        filter(lambda x: x in set(string.printable), response_raw)
+        response = str(response_raw, 'ascii', errors='ignore').strip('x')
         if 'NG' in response or response == '':
             return False
         hexnum = response.split('OK')[1]
