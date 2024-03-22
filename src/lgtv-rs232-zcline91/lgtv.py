@@ -30,11 +30,27 @@ class LgTV():
         'backlight': 'mg',
         }
 
-    _binary_commands = {'power', 'sound', 'osd', 'control_lock', 'channel_add_del'}
+    _binary_commands = {
+        'power',
+        'sound',
+        'osd',
+        'control_lock',
+        'channel_add_del'
+    }
 
-    _cent_commands = {'volume', 'contrast', 'brightness', 'color', 'tint',
-        'sharpness', 'treble', 'bass', 'balance', 'color_temp', 'backlight'
-        }
+    _cent_commands = {
+        'volume',
+        'contrast',
+        'brightness',
+        'color',
+        'tint',
+        'sharpness',
+        'treble',
+        'bass',
+        'balance',
+        'color_temp',
+        'backlight'
+    }
 
     _other_data = {
         'input': {
@@ -51,7 +67,7 @@ class LgTV():
             'hdmi2': '91',
             'hdmi3': '92',
             'hdmi4': '93',
-            },
+        },
         'aspect': {
             '4x3': '01',
             '16x9': '02',
@@ -73,12 +89,12 @@ class LgTV():
             'zoom14': '1d',
             'zoom15': '1e',
             'zoom16': '1f',
-            },
+        },
         'screen_mute': {
             'off': '00',
             'on': '01',
             'vid_out_mute': '10',
-            },
+        },
         '3d': {
             'tb': '00 00 00 00',
             'sbs_rtl': '00 01 00 00',
@@ -88,7 +104,7 @@ class LgTV():
             'off': '01 00 00 00',
             '3d_2d': '02 00 00 00',
             '2d_3d': '03 00 00 0a',
-            },
+        },
         'extended_3d': dict(),
         'energy': {
             'off': '00',
@@ -97,7 +113,7 @@ class LgTV():
             'maximum': '03',
             'auto': '04',
             'screen_off': '05',
-            },
+        },
         'auto_config': {'run': '01'},
         'channel_tuning': dict(),
         'key': {
@@ -160,11 +176,12 @@ class LgTV():
             '4x3': '76',
             '16x9': '77',
             'ratio_zoom': 'af',
-            },
+        },
     }
 
     def __init__(self, path, update=True):
-        # path is a string set to the location of the serial device, e.g. "/dev/ttyUSB0"
+        # path is a string set to the location of the serial device, 
+        # e.g. "/dev/ttyUSB0"
         self._volume = None
         self._muted = None
         self._input = None
@@ -193,9 +210,9 @@ class LgTV():
     def is_on(self):
         status = self.request('power', 'check')
         if status == 'on':
-            return(True)
+            return True
         else:
-            return(False)  
+            return False
 
     def request(self, command, value):
         assert command in self._commands.keys()
@@ -210,7 +227,7 @@ class LgTV():
                 data = '01'
         elif command in self._cent_commands:
             assert value in [str(i) for i in range(101)]
-            data = hex(int(value))[2:] #Convert integer to OxAB
+            data = hex(int(value))[2:] # Convert integer to OxAB
             if len(data) == 1:
                 data = '0' + data
         else:
@@ -218,31 +235,36 @@ class LgTV():
             data = self._other_data[command][value]   
         # For an explanation of the format of the request, see 
         # http://gscs-b2c.lge.com/downloadFile?fileId=6CNJQR84slwAZdSBiw2DA
-        request = bytes(' '.join((self._commands[command], '01', data)) + '\n', 'ascii') 
+        request = bytes(
+            ' '.join((self._commands[command], '01', data)) + '\n',
+            'ascii'
+        ) 
 
         self._ser.write(request)
 
         response = str(self._ser.read_until(b'x'), 'ascii').strip('x')
         if 'NG' in response or response == '':
-            return(False)
+            return False
         hexnum = response.split('OK')[1]
         if value == 'check':
             if command in self._binary_commands:
                 if hexnum == '00':
-                    return('off')
+                    return 'off'
                 elif hexnum == '01':
-                    return('on')
+                    return 'on'
             elif command in self._cent_commands:
-                return(int('0x' + hexnum, 0)) #Convert 0xAB to integer
+                return int('0x' + hexnum, 0) # Convert 0xAB to integer
             else:
-                return(next(key for key, value in self._other_data[command].items() if value == hexnum))
+                return next(
+                    key for key, value in self._other_data[command].items()
+                    if value == hexnum
+                )
         else:
             if hexnum == data:
-                return(True)
+                return True
             else:
-                return(False)
+                return False
 
-    # Returns a dictionary
     def update_status(self):
         self._input = self.request('input', 'check')
         sound = self.request('sound', 'check')
@@ -250,4 +272,4 @@ class LgTV():
             self._muted = True
         else:
             self._muted = False
-        self._volume = self.request('volume', 'check')  
+        self._volume = self.request('volume', 'check')
