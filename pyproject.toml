@@ -21,4 +21,6 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://www.example.com"
+Homepage = "https://github.com/zcline91/lgtv-rs232-zcline91"
+Repository = "https://github.com/zcline91/lgtv-rs232-zcline91.git"
+Issues = "https://github.com/zcline91/lgtv-rs232-zcline91/issues"
