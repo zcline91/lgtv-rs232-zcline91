@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lgtv-rs232-zcline91"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
     {name = "Zachary Cline", email = "zachcline@gmail.com"}
 ]
@@ -12,7 +12,7 @@ description = "A small package for controlling my LG TV through its serial port"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"
 dependencies = [
-    "serial",
+    "pyserial",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
