@@ -179,12 +179,16 @@ class LgTV():
         },
     }
 
-    def __init__(self, path, update=True):
-        # path is a string set to the location of the serial device, 
-        # e.g. "/dev/ttyUSB0"
+    def __init__(self, path, tv_id=0, update=True):
+        # path is a string set to the location of the serial device, e.g. "/dev/ttyUSB0"
+        # id is the tv id whcich can be set in tv options, as defalut value brodcast id is used
         self._volume = None
         self._muted = None
         self._input = None
+        if 0 <= tv_id <= 100:
+           self._id = '%02x' % tv_id
+        else:
+           self._id = '00'
         self._sources = sorted(self._other_data['input'].keys())
         self._ser = serial.Serial(path, timeout=2.0, write_timeout=2.0)
         if update and self.is_on:
@@ -236,7 +240,7 @@ class LgTV():
         # For an explanation of the format of the request, see 
         # http://gscs-b2c.lge.com/downloadFile?fileId=6CNJQR84slwAZdSBiw2DA
         request = bytes(
-            ' '.join((self._commands[command], '01', data)) + '\n',
+            ' '.join((self._commands[command], self._id, data)) + '\n',
             'ascii'
         ) 
 
