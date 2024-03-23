@@ -236,7 +236,7 @@ class LgTV():
         # For an explanation of the format of the request, see 
         # http://gscs-b2c.lge.com/downloadFile?fileId=6CNJQR84slwAZdSBiw2DA
         request = bytes(
-            ' '.join((self._commands[command], '01', data)) + '\n',
+            ' '.join((self._commands[command], '01', data)) + '\r\n',
             'ascii'
         ) 
 
