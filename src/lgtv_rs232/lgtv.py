@@ -185,7 +185,7 @@ class LgTV():
         self._volume = None
         self._muted = None
         self._input = None
-        if 0 <= tv_id <= 100:
+        if 0 <= tv_id <= 99:
            self._id = '%02x' % tv_id
         else:
            self._id = '00'
