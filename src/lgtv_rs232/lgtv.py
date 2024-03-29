@@ -240,16 +240,27 @@ class LgTV():
         # For an explanation of the format of the request, see 
         # http://gscs-b2c.lge.com/downloadFile?fileId=6CNJQR84slwAZdSBiw2DA
         request = bytes(
-            ' '.join((self._commands[command], '01', data)) + '\r\n',
+            ' '.join((self._commands[command], self._id, data)) + '\r\n',
             'ascii'
         ) 
 
         self._ser.write(request)
 
-        response = str(self._ser.read_until(b'x'), 'ascii').strip('x')
+        # There can be some garbage on console after power on command
+        # Lets filter it out using ignore
+        response = str(self._ser.read_until(b'x'), 'ascii', errors='ignore').strip('x')
         if 'NG' in response or response == '':
             return False
-        hexnum = response.split('OK')[1]
+        try:
+            hexnum = response.split('OK')[1]
+            tv_id = response.split('OK')[0].split(' ')[1]
+            command_code = (response.split('OK')[0]).split(' ')[0][-1]
+        except IndexError as exc:
+            return False
+        if command_code != self._commands[command][-1]:
+            return False
+        if self._id != '00' and self._id != tv_id:
+            return False
         if value == 'check':
             if command in self._binary_commands:
                 if hexnum == '00':
