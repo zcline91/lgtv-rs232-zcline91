@@ -277,3 +277,6 @@ class LgTV():
         else:
             self._muted = False
         self._volume = self.request('volume', 'check')
+
+    def __del__(self):
+        self._ser.close()
