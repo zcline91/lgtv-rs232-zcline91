@@ -1,5 +1,5 @@
+import asyncio
 import serial
-
 
 class LgTV():
     _commands = {
@@ -288,6 +288,14 @@ class LgTV():
         else:
             self._muted = False
         self._volume = self.request('volume', 'check')
+
+    async def wake(self, iterations=2, delay=1):
+        for _ in range(iterations):
+            response = self.request('power', 'on')
+            await asyncio.sleep(delay)
+            if response is not False:
+                break
+        return response
 
     def __del__(self):
         self._ser.close()
