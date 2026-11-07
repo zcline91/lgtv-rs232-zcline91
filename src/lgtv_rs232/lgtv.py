@@ -176,6 +176,7 @@ class LgTV():
             '4x3': '76',
             '16x9': '77',
             'ratio_zoom': 'af',
+            'smarthome': '7C',
         },
     }
 
